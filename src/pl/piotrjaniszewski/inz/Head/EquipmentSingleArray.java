@@ -7,7 +7,7 @@ public class EquipmentSingleArray {
     private int width;
     private int height;
     private int numberOfDrills;
-    private int[] headEquipmnet;
+    private int[] headEquipment;
     private int minimalNumberOfHoles = 1;
 
     private boolean stepsCalculated=false;
@@ -16,64 +16,94 @@ public class EquipmentSingleArray {
 
     private Random rnd = new Random();
 
-    public EquipmentSingleArray(int[] headEquipmnet, int width, int numberOfDrills) {
-        this.headEquipmnet=headEquipmnet;
+    public EquipmentSingleArray(int[] headEquipment, int width, int numberOfDrills) {
+        this.headEquipment =headEquipment;
         this.width = width;
-        this.height = headEquipmnet.length-width;
+        this.height = headEquipment.length-width;
     }
 
     public EquipmentSingleArray(int width, int height, int numberOfDrills) {
         this.width = width;
         this.height = height;
         this.numberOfDrills = numberOfDrills;
-        headEquipmnet = new int[width+height];
+        headEquipment = new int[width+height];
         randomGenerate();
     }
 
-    public EquipmentSingleArray(Equipment equipment1, Equipment equipment2){
+    public EquipmentSingleArray(EquipmentSingleArray equipment1, EquipmentSingleArray equipment2){
         this.width = equipment1.width;
         this.height = equipment1.height;
         this.numberOfDrills = equipment1.numberOfDrills;
+        headEquipment = newHeadEquipment(equipment1.headEquipment,equipment2.headEquipment);
+    }
+
+    private int[] newHeadEquipment(int[] headEquipment1, int[] headEquipment2){
+        int[] newHeadEquipment = new int[headEquipment1.length];
+        int[] tmp = new int[numberOfDrills+1];
+        List<Integer> emptyDrillPositions = new LinkedList<>();
+        for (int i = 0; i < headEquipment1.length; i++) {
+            if(headEquipment1[i]==headEquipment2[i]){
+                newHeadEquipment[i]=headEquipment1[i];
+                tmp[headEquipment1[i]]=1;
+            } else{
+                emptyDrillPositions.add(i);
+            }
+        }
+
+        //sprawdzenie czego brakuje
+        for (int i = 1; i < tmp.length; i++) {
+            if(tmp[i]==0){
+                int position = rnd.nextInt(emptyDrillPositions.size());
+                newHeadEquipment[position]=i;
+                emptyDrillPositions.remove(i);
+            }
+        }
+
+        for (int i = 0; i < emptyDrillPositions.size(); i++) {
+            newHeadEquipment[emptyDrillPositions.get(i)]=rnd.nextInt(numberOfDrills)+1;
+        }
+
+        return newHeadEquipment;
     }
 
     private void randomGenerate(){
-        headEquipmnet=new int[width+height];
+        headEquipment =new int[width+height];
         for (int i = 0; i < numberOfDrills; i++) {
-            headEquipmnet[i]=i+1;
+            headEquipment[i]=i+1;
         }
-        for (int i = numberOfDrills; i < headEquipmnet.length; i++) {
-            headEquipmnet[i]=rnd.nextInt(numberOfDrills)+1;
+        for (int i = numberOfDrills; i < headEquipment.length; i++) {
+            headEquipment[i]=rnd.nextInt(numberOfDrills)+1;
         }
         int index;
         int temp;
-        for (int i = headEquipmnet.length - 1; i > 0; i--)
+        for (int i = headEquipment.length - 1; i > 0; i--)
         {
             index = rnd.nextInt(i + 1);
-            temp = headEquipmnet[index];
-            headEquipmnet[index] = headEquipmnet[i];
-            headEquipmnet[i] = temp;
+            temp = headEquipment[index];
+            headEquipment[index] = headEquipment[i];
+            headEquipment[i] = temp;
         }
     }
 
-    public int getNumberOfSteps(List<HeadPosition> possibleHeadPositions){
+    public int getNumberOfSteps(List<HeadPosition> possibleHeadPositions, List<Hole> holes){
         if (stepsCalculated){
             return numberOfSteps;
         } else {
-            calculateSteps(possibleHeadPositions);
+            calculateSteps(possibleHeadPositions, holes);
             return numberOfSteps;
         }
     }
 
-    public List<HeadPosition> getHeadPositions(List<HeadPosition> possibleHeadPositions) {
+    public List<HeadPosition> getHeadPositions(List<HeadPosition> possibleHeadPositions, List<Hole> holes) {
         if(stepsCalculated){
             return headPositions;
         } else {
-            calculateSteps(possibleHeadPositions);
+            calculateSteps(possibleHeadPositions, holes);
             return headPositions;
         }
     }
 
-    private void calculateSteps(List<HeadPosition> possibleHeadPositions){
+    private void calculateSteps(List<HeadPosition> possibleHeadPositions, List<Hole> holes){
         //dla listy possibleHeadPositions tworze nową listę i bangladesz;
         for (int i = 0; i < possibleHeadPositions.size(); i++) {
             int x = possibleHeadPositions.get(i).getX();//pozycja głowicy
@@ -85,12 +115,12 @@ public class EquipmentSingleArray {
                 int testedY = testedHole.getY()-y;
                 if(testedY==0){
                     //poziomo
-                    if(headEquipmnet[testedX]==testedHole.getType()){
+                    if(headEquipment[testedX]==testedHole.getType()){
                         possibleHoles.add(new Hole(testedHole.getX(),testedHole.getY(),testedHole.getType()));
                     }
                 } else {
                     //pionowo
-                    if(headEquipmnet[width+testedY-1]==testedHole.getType()){
+                    if(headEquipment[width+testedY-1]==testedHole.getType()){
                         possibleHoles.add(new Hole(testedHole.getX(),testedHole.getY(),testedHole.getType()));
                     }
                 }
@@ -100,43 +130,31 @@ public class EquipmentSingleArray {
                 headPositions.add(new HeadPosition(x,y,possibleHoles));
             }
         }
-
-//        headPositions.sort(Comparator.comparingInt(new ToIntFunction<HeadPosition>() {
-//            @Override
-//            public int applyAsInt(HeadPosition value) {
-//                return -value.getPossibleHoles().size();
-//            }
-//        }));
         minimalizeNumberOfSteps();
-        //znalezc niepokryte otwory
-
-        System.out.println();
-        System.out.println();
-
-        for (int i = 0; i < headPositions.size(); i++) {
-            System.out.println(i+": "+headPositions.get(i).getPossibleHoles().size());
+        List<Hole>remainingHoles = getUndrilledHoles(holes,headPositions);
+        for (int i = 0; i < remainingHoles.size(); i++) {
+            for (int j = 0; j < headEquipment.length; j++) {
+                if(remainingHoles.get(i).getType()== headEquipment[j]){
+                    List<Hole> holeList = new LinkedList<>();
+                    holeList.add(remainingHoles.get(i));
+                    if(j<width){
+                        int x = remainingHoles.get(i).getX()-j;
+                        int y = remainingHoles.get(i).getY();
+                        headPositions.add(new HeadPosition(x,y,holeList));
+                    } else {
+                        int x = remainingHoles.get(i).getX();
+                        int y = remainingHoles.get(i).getY()-(j+width+1);
+                        headPositions.add(new HeadPosition(x,y,holeList));
+                    }
+                    break;
+                }
+            }
         }
-        System.out.println();
-        System.out.println();
-
         numberOfSteps=headPositions.size();
+        stepsCalculated=true;
     }
 
     private void minimalizeNumberOfSteps() {
-        mnosV1();
-        mnosV2();
-    }
-    private HeadPosition max(){
-        HeadPosition max = headPositions.get(0);
-        for (int i = 1; i < headPositions.size(); i++) {
-            if(headPositions.get(i).getPossibleHoles().size()>max.getPossibleHoles().size()){
-                max = headPositions.get(i);
-            }
-        }
-        return max;
-    }
-
-    private void mnosV1() {
         List<HeadPosition> minimalHeadPositions = new LinkedList<>();
         while(headPositions.size()!=0){
             HeadPosition headPosition = max();
@@ -156,26 +174,37 @@ public class EquipmentSingleArray {
                 }
             } //usuwam puste ustawienia
         }
-
-        headPositions=minimalHeadPositions; //wszystkie ustawienia głowicy wiercące więcej niż jeden
-        //dodać do listy pozycji pozycje które mają jeden otwór
-        System.out.println("Po minimalizacj: "+ headPositions.size());
+        this.headPositions=minimalHeadPositions;
     }
 
-    // porównywanie - kto wywiercił więcej otworów bez sensu
-    private void mnosV2() {
+    private HeadPosition max(){
+        HeadPosition max = headPositions.get(0);
+        for (int i = 1; i < headPositions.size(); i++) {
+            if(headPositions.get(i).getPossibleHoles().size()>max.getPossibleHoles().size()){
+                max = headPositions.get(i);
+            }
+        }
+        return max;
+    }
 
+    private List<Hole> getUndrilledHoles(List<Hole> holes, List<HeadPosition>headPositions){
+        for (int i = 0; i < headPositions.size(); i++) {
+            for (int j = 0; j < headPositions.get(i).getPossibleHoles().size(); j++) {
+                holes.remove(headPositions.get(i).getPossibleHoles().get(j));
+            }
+        }
+        return holes;
     }
 
     @Override
     public String toString() {
         String tmp ="";
         for (int i = 0; i < width; i++) {
-            tmp+= headEquipmnet[i]+" ";
+            tmp+= headEquipment[i]+" ";
         }
         tmp+="\n";
-        for (int i = width; i < headEquipmnet.length; i++) {
-            tmp+= headEquipmnet[i]+"\n";
+        for (int i = width; i < headEquipment.length; i++) {
+            tmp+= headEquipment[i]+"\n";
         }
 
         return tmp;

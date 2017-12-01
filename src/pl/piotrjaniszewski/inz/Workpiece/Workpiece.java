@@ -97,14 +97,13 @@ public class Workpiece {
 
     public List<HeadPosition> getAnyHeadPositions(int headWidth, int headHeight){
         List<HeadPosition> headPositions = new LinkedList<>();
-        System.out.println(width+" "+height);
 
         for (int i = -headWidth ; i < width + headWidth + 1; i++) {
             for ( int j = -headHeight; j < height + headHeight + 1; j++) {
                 List<Hole> list = new LinkedList<>();
 
                 for (int k = 0; k < headWidth; k++) {
-                    if( j>=0 && i+k>=0 && j<holes.length && i+k<holes[0].length){
+                    if( j>=0 && i+k>=0 && j<height&& i+k<width){
                         if(holes[i+k][j]!=0){
                             list.add(new Hole(i+k,j,holes[i+k][j]));
                         }
@@ -112,7 +111,7 @@ public class Workpiece {
                 }
 
                 for (int k = 1; k <= headHeight; k++) {
-                    if(i>=0 && j+k>=0 && i<holes[0].length && j+k<holes.length){
+                    if(i>=0 && j+k>=0 && i<width && j+k<height){
                         if(holes[i][j+k]!=0){
                             list.add(new Hole(i,j+k,holes[i][j+k]));
                         }
@@ -129,14 +128,13 @@ public class Workpiece {
 
     public List<HeadPosition> getHeadPositionsWithMinimal(int headWidth, int headHeight, int minimalNumberOfHoles){
         List<HeadPosition> headPositions = new LinkedList<>();
-        System.out.println(width+" "+height);
 
         for (int i = -headWidth ; i < width + headWidth + 1; i++) {
             for ( int j = -headHeight; j < height + headHeight + 1; j++) {
                 List<Hole> list = new LinkedList<>();
 
                 for (int k = 0; k < headWidth; k++) {
-                    if( j>=0 && i+k>=0 && j<holes.length && i+k<holes[0].length){
+                    if( j>=0 && i+k>=0 && j<height && i+k<width){
                         if(holes[i+k][j]!=0){
                             list.add(new Hole(i+k,j,holes[i+k][j]));
                         }
@@ -144,7 +142,7 @@ public class Workpiece {
                 }
 
                 for (int k = 1; k <= headHeight; k++) {
-                    if(i>=0 && j+k>=0 && i<holes[0].length && j+k<holes.length){
+                    if(i>=0 && j+k>=0 && i<width && j+k<height){
                         if(holes[i][j+k]!=0){
                             list.add(new Hole(i,j+k,holes[i][j+k]));
                         }
