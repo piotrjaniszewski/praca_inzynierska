@@ -1,6 +1,8 @@
 package pl.piotrjaniszewski.inz.Workpiece;
 
 
+import pl.piotrjaniszewski.inz.Head.Equipment;
+import pl.piotrjaniszewski.inz.Head.EquipmentSingleArray;
 import pl.piotrjaniszewski.inz.Head.HeadPosition;
 
 import java.io.File;
@@ -125,6 +127,17 @@ public class Workpiece {
         }
         return headPositions;
     }
+
+    public boolean isDrilled(List<HeadPosition> headPositions){
+        List<Hole> holes = getHolesList();
+        for (int i = 0; i < headPositions.size(); i++) {
+            for (int j = 0; j < headPositions.get(i).getPossibleHoles().size(); j++) {
+                holes.remove(headPositions.get(i).getPossibleHoles().get(j));
+            }
+        }
+        return holes.isEmpty();
+    }
+
 
     public List<HeadPosition> getHeadPositionsWithMinimal(int headWidth, int headHeight, int minimalNumberOfHoles){
         List<HeadPosition> headPositions = new LinkedList<>();

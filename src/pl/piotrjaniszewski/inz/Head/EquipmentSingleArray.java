@@ -20,6 +20,7 @@ public class EquipmentSingleArray {
         this.headEquipment =headEquipment;
         this.width = width;
         this.height = headEquipment.length-width;
+        this.numberOfDrills=numberOfDrills;
     }
 
     public EquipmentSingleArray(int width, int height, int numberOfDrills) {
@@ -38,30 +39,8 @@ public class EquipmentSingleArray {
     }
 
     private int[] newHeadEquipment(int[] headEquipment1, int[] headEquipment2){
+        //bez sensu
         int[] newHeadEquipment = new int[headEquipment1.length];
-        int[] tmp = new int[numberOfDrills+1];
-        List<Integer> emptyDrillPositions = new LinkedList<>();
-        for (int i = 0; i < headEquipment1.length; i++) {
-            if(headEquipment1[i]==headEquipment2[i]){
-                newHeadEquipment[i]=headEquipment1[i];
-                tmp[headEquipment1[i]]=1;
-            } else{
-                emptyDrillPositions.add(i);
-            }
-        }
-
-        //sprawdzenie czego brakuje
-        for (int i = 1; i < tmp.length; i++) {
-            if(tmp[i]==0){
-                int position = rnd.nextInt(emptyDrillPositions.size());
-                newHeadEquipment[position]=i;
-                emptyDrillPositions.remove(i);
-            }
-        }
-
-        for (int i = 0; i < emptyDrillPositions.size(); i++) {
-            newHeadEquipment[emptyDrillPositions.get(i)]=rnd.nextInt(numberOfDrills)+1;
-        }
 
         return newHeadEquipment;
     }
@@ -130,7 +109,7 @@ public class EquipmentSingleArray {
                 headPositions.add(new HeadPosition(x,y,possibleHoles));
             }
         }
-        minimalizeNumberOfSteps();
+        minimizeNumberOfSteps();
         List<Hole>remainingHoles = getUndrilledHoles(holes,headPositions);
         for (int i = 0; i < remainingHoles.size(); i++) {
             for (int j = 0; j < headEquipment.length; j++) {
@@ -154,7 +133,7 @@ public class EquipmentSingleArray {
         stepsCalculated=true;
     }
 
-    private void minimalizeNumberOfSteps() {
+    private void minimizeNumberOfSteps() {
         List<HeadPosition> minimalHeadPositions = new LinkedList<>();
         while(headPositions.size()!=0){
             HeadPosition headPosition = max();
@@ -187,7 +166,8 @@ public class EquipmentSingleArray {
         return max;
     }
 
-    private List<Hole> getUndrilledHoles(List<Hole> holes, List<HeadPosition>headPositions){
+    private List<Hole> getUndrilledHoles(List<Hole> allHoles, List<HeadPosition>headPositions){
+        List<Hole> holes = new LinkedList<>(allHoles);
         for (int i = 0; i < headPositions.size(); i++) {
             for (int j = 0; j < headPositions.get(i).getPossibleHoles().size(); j++) {
                 holes.remove(headPositions.get(i).getPossibleHoles().get(j));
