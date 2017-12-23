@@ -10,8 +10,6 @@ public class HeadPosition {
     private int y;
     private List<Hole> possibleHoles;
 
-
-
     public int getX() {
         return x;
     }
@@ -36,13 +34,12 @@ public class HeadPosition {
         this.y=headPosition.getY();
     }
 
-
     @Override
     public String toString() {
         return "HeadPosition{" +
                 "x=" + x +
                 ", y=" + y +
-                ", possibleHoles=" + possibleHoles +
+                ", possibleHoles=" + possibleHoles.size() +
                 '}';
     }
 }

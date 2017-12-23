@@ -51,13 +51,11 @@ public class EquipmentOptimizationAlgorithm {
         while (System.currentTimeMillis()-startTime< duration){
             List<EquipmentSingleArray> newPopulation = new LinkedList<>();
             for (int i = 0; i < populationSize; i++) {
-                newPopulation.add(new EquipmentSingleArray(headWidth,headHeight,numberOfDrills));
-//                newPopulation.add(new EquipmentSingleArray(new int[]{1 ,4 ,1 ,3, 2,1,2,3, 4},4,4));
+                newPopulation.add(new EquipmentSingleArray( getEquipment(),getEquipment()) );
+//                newPopulation.add(new EquipmentSingleArray(headWidth,headHeight,numberOfDrills));
             }
 
             EquipmentSingleArray populationBest = findBest(newPopulation);
-            //z którymi innymi wiertlami dane wiertło jest uzywane
-//            System.out.println(populationBest.getNumberOfSteps(anyHeadPositions,holes));
             if(populationBest.getNumberOfSteps(anyHeadPositions,holes) < best.getNumberOfSteps(anyHeadPositions,holes)){
                 best=populationBest;
                 System.out.println("Nowy minimalny: "+best.getNumberOfSteps(anyHeadPositions,holes));

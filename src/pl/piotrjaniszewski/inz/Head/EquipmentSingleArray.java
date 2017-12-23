@@ -8,20 +8,14 @@ public class EquipmentSingleArray {
     private int height;
     private int numberOfDrills;
     private int[] headEquipment;
-    private int minimalNumberOfHoles = 1;
+    private int minimalNumberOfHoles = 2;
 
     private boolean stepsCalculated=false;
     private int numberOfSteps;
     private List<HeadPosition> headPositions  = new LinkedList<>();
 
     private Random rnd = new Random();
-
-    public EquipmentSingleArray(int[] headEquipment, int width, int numberOfDrills) {
-        this.headEquipment =headEquipment;
-        this.width = width;
-        this.height = headEquipment.length-width;
-        this.numberOfDrills=numberOfDrills;
-    }
+    private List<Pattern> patternsList = new LinkedList();
 
     public EquipmentSingleArray(int width, int height, int numberOfDrills) {
         this.width = width;
@@ -35,15 +29,138 @@ public class EquipmentSingleArray {
         this.width = equipment1.width;
         this.height = equipment1.height;
         this.numberOfDrills = equipment1.numberOfDrills;
-        headEquipment = newHeadEquipment(equipment1.headEquipment,equipment2.headEquipment);
+
+        headEquipment = newHeadEquipment(equipment1.getPatternsList(),equipment2.getPatternsList());
     }
 
-    private int[] newHeadEquipment(int[] headEquipment1, int[] headEquipment2){
-        //bez sensu
-        int[] newHeadEquipment = new int[headEquipment1.length];
+    private int[] newHeadEquipment(List<Pattern> patterns1, List<Pattern> patterns2){
+        for (int i = 0; i < patterns2.size(); i++) {
+            if(!patterns1.contains(patterns2.get(i))){
+                patterns1.add(patterns2.get(i));
+            }
+        }
+
+        int[] newHeadEquipment = new int[width+height];
+        while(!patterns1.isEmpty()){
+            //sprawdzam nastepny patern
+        Pattern pattern = patterns1.get(rnd.nextInt(patterns1.size()));
+//            int start=-1;
+//            int stop=-1;
+//
+//            if(pattern.getPatternType()==1){
+//                 start =1;
+//                    end = width;
+//            } else if(pattern.getPatternType()==2) {
+//
+//            } else {
+//
+//            }
+            List<Integer> positionList= new LinkedList<>();
+            if(pattern.getPatternType()==1){
+                //sprawdzam pierwsze umiejscowienie
+                for (int i = 0; i <= width-pattern.getLength(); i++) {
+                    positionList = new LinkedList<>();
+
+                    boolean flag=true;
+                    for (int j = 0; j < pattern.getLength(); j++) {
+                        if( !(newHeadEquipment[i+j]==0 || newHeadEquipment[i+j]==pattern.getPattern()[j]) ){
+                            flag=false;
+                            break;
+                        }
+                    }
+                    if(flag){
+                        positionList.add(i);
+                    }
+                }
+                //wylosowac punkt
+                if(!positionList.isEmpty()){
+                    int index = positionList.get(rnd.nextInt(positionList.size()));
+                    for (int i = 0; i < pattern.getLength(); i++) {
+                        newHeadEquipment[index+i]=pattern.getPattern()[i];
+                    }
+                }
+
+            } else if(pattern.getPatternType()==2) {
+                //sprawdzam pierwsze umiejscowienie
+                for (int i = width; i <= newHeadEquipment.length-pattern.getLength(); i++) {
+                    positionList = new LinkedList<>();
+
+                    boolean flag=true;
+                    for (int j = width; j < pattern.getLength(); j++) {
+                        if( !(newHeadEquipment[i+j]==0 || newHeadEquipment[i+j]==pattern.getPattern()[j]) ){
+                            flag=false;
+                            break;
+                        }
+                    }
+                    if(flag){
+                        positionList.add(i);
+                    }
+                }
+                //wylosowac punkt
+                if(!positionList.isEmpty()){
+                    int index = positionList.get(rnd.nextInt(positionList.size()));
+                    for (int i = 0; i < pattern.getLength(); i++) {
+                        newHeadEquipment[index+i]=pattern.getPattern()[i];
+                    }
+                }
+
+            } else {
+                boolean flag=true;
+                for (int i = 0; i < newHeadEquipment.length; i++) {
+                    if(!(newHeadEquipment[i]==0||newHeadEquipment[i]==pattern.getPattern()[i])){
+                        flag=false;
+                        break;
+                    }
+                }
+                if(flag){
+                    for (int i = 0; i < newHeadEquipment.length; i++) {
+                        newHeadEquipment[i]=pattern.getPattern()[i];
+                    }
+                }
+            }
+            patterns1.remove(pattern);
+        }
+
+        //mamy juz wszystkie patterny i uzupełniamy wiertłami ( i sprawdzenie czego brakuje )
+        int[] drills = new int[numberOfDrills+1];
+        List<Integer> emptyDrills = new LinkedList<>();
+        for (int i = 0; i < newHeadEquipment.length; i++) {
+            if(newHeadEquipment[i]==0){
+                emptyDrills.add(i);
+            } else {
+                drills[ newHeadEquipment[i] ]++;
+            }
+        }
+
+        int size = emptyDrills.size();
+        for (int i = 1; i < drills.length; i++) {
+            if(drills[i]==0){
+                if(size!=0){
+                    int index = rnd.nextInt(size);
+                    newHeadEquipment[emptyDrills.get(index)]=i;
+                    emptyDrills.remove(index);
+                    size--;
+                } else {
+                    newHeadEquipment[rnd.nextInt(newHeadEquipment.length)]=i;
+                }
+            }
+        }
+
+        for (int i = 0; i < emptyDrills.size(); i++) {
+            newHeadEquipment[emptyDrills.get(i)]=rnd.nextInt(numberOfDrills)+1;
+        }
 
         return newHeadEquipment;
     }
+
+
+
+
+
+
+
+
+
 
     private void randomGenerate(){
         headEquipment =new int[width+height];
@@ -82,36 +199,66 @@ public class EquipmentSingleArray {
         }
     }
 
+    public List<Pattern> getPatternsList() {
+        return patternsList;
+    }
+
     private void calculateSteps(List<HeadPosition> possibleHeadPositions, List<Hole> holes){
         //dla listy possibleHeadPositions tworze nową listę i bangladesz;
         for (int i = 0; i < possibleHeadPositions.size(); i++) {
-            int x = possibleHeadPositions.get(i).getX();//pozycja głowicy
-            int y = possibleHeadPositions.get(i).getY();//pozycja głowicy
+            int x = possibleHeadPositions.get(i).getX(); //pozycja głowicy
+            int y = possibleHeadPositions.get(i).getY(); //pozycja głowicy
+
+            //związki otworów
+            int[] pattern = new int[headEquipment.length];
+
             List<Hole> possibleHoles = new LinkedList<>();
             for (int j = 0; j < possibleHeadPositions.get(i).getPossibleHoles().size(); j++) {
                 Hole testedHole = possibleHeadPositions.get(i).getPossibleHoles().get(j);
                 int testedX = testedHole.getX()-x;
                 int testedY = testedHole.getY()-y;
                 if(testedY==0){
-                    //poziomo
+                    // poziomo
                     if(headEquipment[testedX]==testedHole.getType()){
                         possibleHoles.add(new Hole(testedHole.getX(),testedHole.getY(),testedHole.getType()));
+                        pattern[testedX] = headEquipment[testedX];
+                        //uzywany otwor poziomo
                     }
                 } else {
-                    //pionowo
+                    // pionowo
                     if(headEquipment[width+testedY-1]==testedHole.getType()){
                         possibleHoles.add(new Hole(testedHole.getX(),testedHole.getY(),testedHole.getType()));
+                        pattern[width+testedY-1]=headEquipment[width+testedY-1];
+                        //uzywany otwor pionowo
                     }
                 }
             }
 
             if(possibleHoles.size()>=minimalNumberOfHoles){
                 headPositions.add(new HeadPosition(x,y,possibleHoles));
+                Pattern pattern1 = new Pattern(pattern,width);
+                boolean newPattern = true;
+                for (int j = 0; j < patternsList.size(); j++) {
+                    if(patternsList.get(j).equals(pattern1)){
+                        newPattern =false;
+                        patternsList.get(j).use();
+                        break;
+                    }
+                }
+                if(newPattern){
+                    patternsList.add(pattern1);
+                }
             }
         }
-        minimizeNumberOfSteps();
-        List<Hole>remainingHoles = getUndrilledHoles(holes,headPositions);
-        for (int i = 0; i < remainingHoles.size(); i++) {
+
+        for (int i = 0; i < patternsList.size(); i++) {
+            patternsList.get(i).minimisePattern();
+        }
+
+        minimizeNumberOfSteps(); // ustawenia gdzie jest ponad 2 otwory
+
+        List<Hole>remainingHoles = getUndrilledHoles(holes,headPositions); // otwory które nie zostały wywiercone
+        for (int i = 0; i < remainingHoles.size(); i++) { //wiercenie niewywierconych otworow
             for (int j = 0; j < headEquipment.length; j++) {
                 if(remainingHoles.get(i).getType()== headEquipment[j]){
                     List<Hole> holeList = new LinkedList<>();
