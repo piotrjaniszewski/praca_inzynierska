@@ -10,27 +10,34 @@ public class EquipmentSingleArray {
     private int[] headEquipment;
     private int minimalNumberOfHoles = 2;
 
-    private boolean stepsCalculated=false;
     private int numberOfSteps;
     private List<HeadPosition> headPositions  = new LinkedList<>();
 
     private Random rnd = new Random();
     private List<Pattern> patternsList = new LinkedList();
 
-    public EquipmentSingleArray(int width, int height, int numberOfDrills) {
+    private List<HeadPosition> possibleHeadPositions;
+    private List<Hole> holes;
+
+    public EquipmentSingleArray(int width, int height, int numberOfDrills, List<HeadPosition> possibleHeadPositions, List<Hole> holes) {
         this.width = width;
         this.height = height;
         this.numberOfDrills = numberOfDrills;
+        this.possibleHeadPositions=possibleHeadPositions;
+        this.holes=holes;
         headEquipment = new int[width+height];
         randomGenerate();
+        calculateSteps();
     }
 
     public EquipmentSingleArray(EquipmentSingleArray equipment1, EquipmentSingleArray equipment2){
         this.width = equipment1.width;
         this.height = equipment1.height;
         this.numberOfDrills = equipment1.numberOfDrills;
-
+        this.holes=equipment1.holes;
+        this.possibleHeadPositions=equipment1.possibleHeadPositions;
         headEquipment = newHeadEquipment(equipment1.getPatternsList(),equipment2.getPatternsList());
+        calculateSteps();
     }
 
     private int[] newHeadEquipment(List<Pattern> patterns1, List<Pattern> patterns2){
@@ -44,17 +51,6 @@ public class EquipmentSingleArray {
         while(!patterns1.isEmpty()){
             //sprawdzam nastepny patern
         Pattern pattern = patterns1.get(rnd.nextInt(patterns1.size()));
-//            int start=-1;
-//            int stop=-1;
-//
-//            if(pattern.getPatternType()==1){
-//                 start =1;
-//                    end = width;
-//            } else if(pattern.getPatternType()==2) {
-//
-//            } else {
-//
-//            }
             List<Integer> positionList= new LinkedList<>();
             if(pattern.getPatternType()==1){
                 //sprawdzam pierwsze umiejscowienie
@@ -153,15 +149,6 @@ public class EquipmentSingleArray {
         return newHeadEquipment;
     }
 
-
-
-
-
-
-
-
-
-
     private void randomGenerate(){
         headEquipment =new int[width+height];
         for (int i = 0; i < numberOfDrills; i++) {
@@ -181,29 +168,19 @@ public class EquipmentSingleArray {
         }
     }
 
-    public int getNumberOfSteps(List<HeadPosition> possibleHeadPositions, List<Hole> holes){
-        if (stepsCalculated){
-            return numberOfSteps;
-        } else {
-            calculateSteps(possibleHeadPositions, holes);
-            return numberOfSteps;
-        }
+    public int getNumberOfSteps() {
+        return numberOfSteps;
     }
 
-    public List<HeadPosition> getHeadPositions(List<HeadPosition> possibleHeadPositions, List<Hole> holes) {
-        if(stepsCalculated){
-            return headPositions;
-        } else {
-            calculateSteps(possibleHeadPositions, holes);
-            return headPositions;
-        }
+    public List<HeadPosition> getHeadPositions() {
+        return headPositions;
     }
 
     public List<Pattern> getPatternsList() {
         return patternsList;
     }
 
-    private void calculateSteps(List<HeadPosition> possibleHeadPositions, List<Hole> holes){
+    private void calculateSteps(){
         //dla listy possibleHeadPositions tworze nową listę i bangladesz;
         for (int i = 0; i < possibleHeadPositions.size(); i++) {
             int x = possibleHeadPositions.get(i).getX(); //pozycja głowicy
@@ -277,7 +254,6 @@ public class EquipmentSingleArray {
             }
         }
         numberOfSteps=headPositions.size();
-        stepsCalculated=true;
     }
 
     private void minimizeNumberOfSteps() {

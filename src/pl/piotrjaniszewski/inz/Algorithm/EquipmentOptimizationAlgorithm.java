@@ -44,7 +44,7 @@ public class EquipmentOptimizationAlgorithm {
         //populacja startowa
         population = new LinkedList<>();
         for (int i = 0; i < populationSize; i++) {
-            population.add(new EquipmentSingleArray(headWidth,headHeight,numberOfDrills));
+            population.add(new EquipmentSingleArray(headWidth,headHeight,numberOfDrills,anyHeadPositions,holes));
         }
         best = findBest(population);
 
@@ -56,9 +56,9 @@ public class EquipmentOptimizationAlgorithm {
             }
 
             EquipmentSingleArray populationBest = findBest(newPopulation);
-            if(populationBest.getNumberOfSteps(anyHeadPositions,holes) < best.getNumberOfSteps(anyHeadPositions,holes)){
+            if(populationBest.getNumberOfSteps() < best.getNumberOfSteps()){
                 best=populationBest;
-                System.out.println("Nowy minimalny: "+best.getNumberOfSteps(anyHeadPositions,holes));
+                System.out.println("Nowy minimalny: "+best.getNumberOfSteps());
             }
 
             this.population=newPopulation;
@@ -70,10 +70,11 @@ public class EquipmentOptimizationAlgorithm {
     }
 
     private EquipmentSingleArray getEquipment(){
+        // TODO najbardziej różniące się osobniki
         EquipmentSingleArray equipment1 = population.get(rnd.nextInt(populationSize-1));
         EquipmentSingleArray equipment2 = population.get(rnd.nextInt(populationSize-1));
 
-        if(equipment1.getNumberOfSteps(anyHeadPositions,holes)>equipment2.getNumberOfSteps(anyHeadPositions,holes)){
+        if(equipment1.getNumberOfSteps()>equipment2.getNumberOfSteps()){
             return equipment1;
         } else {
             return equipment2;
@@ -82,11 +83,11 @@ public class EquipmentOptimizationAlgorithm {
 
     private EquipmentSingleArray findBest(List<EquipmentSingleArray> population){
         EquipmentSingleArray best = population.get(0);
-        int min = best.getNumberOfSteps(anyHeadPositions,holes);
+        int min = best.getNumberOfSteps();
         for (int i = 0; i < population.size(); i++) {
-            if(population.get(i).getNumberOfSteps(anyHeadPositions,holes) < min){
+            if(population.get(i).getNumberOfSteps() < min){
                 best=population.get(i);
-                min = population.get(i).getNumberOfSteps(anyHeadPositions,holes);
+                min = population.get(i).getNumberOfSteps();
             }
         }
         return best;

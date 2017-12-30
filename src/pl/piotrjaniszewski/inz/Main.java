@@ -28,8 +28,8 @@ public class Main {
         System.out.println();
         System.out.println(best);
         System.out.println();
-        System.out.println("Liczba krokow: " + best.getNumberOfSteps(workpiece.getHeadPositionsWithMinimal(headWidth,headHeight,2),holes));
-        System.out.println(workpiece.isDrilled(best.getHeadPositions(workpiece.getHeadPositionsWithMinimal(headWidth,headHeight,2),holes)));
+//        System.out.println("Liczba krokow: " + best.getNumberOfSteps(workpiece.getHeadPositionsWithMinimal(headWidth,headHeight,2),holes));
+//        System.out.println(workpiece.isDrilled(best.getHeadPositions(workpiece.getHeadPositionsWithMinimal(headWidth,headHeight,2),holes)));
         List<Pattern> patterns =  best.getPatternsList();
         for (int i = 0; i < patterns.size(); i++) {
             System.out.println(patterns.get(i));
