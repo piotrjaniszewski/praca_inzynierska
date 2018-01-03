@@ -1,144 +1,144 @@
 package pl.piotrjaniszewski.inz.inverover;
 
-import pl.piotrjaniszewski.inz.inverover.utils.PobierzPunkty;
-import pl.piotrjaniszewski.inz.inverover.utils.Punkt;
+import pl.piotrjaniszewski.inz.Head.HeadPosition;
 
 import java.util.Random;
 
 public class InverOver {
 
-    private Punkt[] punkty;
+    private HeadPosition[] points;
     private Random random;
-    private int rozmiarPopulacji;
-    private long czasTrwania;
-    double p;
-    private Path[] populacja;
-    private Path najlepszy;
-    public  int ilosc;
+    private int populationSize;
+    private long time;
+    private double mutationProbability;
+    private Path[] population;
+    private Path best;
 
-    public InverOver(int rozmiarPopulacji, long czasTrwania, double p, String nazwaPliku) {
-        this.rozmiarPopulacji = rozmiarPopulacji;
-        this.czasTrwania = czasTrwania;
-        this.p = p;
-        punkty= PobierzPunkty.ZPlikuTsp(nazwaPliku);
+    public InverOver(int populationSize, long time, double mutationProbability, HeadPosition[] points) {
+        this.populationSize = populationSize;
+        this.time = time;
+        this.mutationProbability = mutationProbability;
+        this.points = points;
         random = new Random();
     }
 
-    public Path getNajlepszy() {
-        return najlepszy;
+    public Path getBest() {
+        return best;
     }
 
-    public void StartClassic(){
-        populacja = populacjaZachlanna(this.rozmiarPopulacji);
-//        populacja = populacjaLosowa(this.rozmiarPopulacji);
+    public void start(){
+        population = greedyPopulation(this.populationSize);
 
-        najlepszy=populacja[0];
+        best = population[0];
 
         long start = System.currentTimeMillis();
-        while(System.currentTimeMillis()-start<czasTrwania){
-            ilosc++;
-            for (int i = 0; i < rozmiarPopulacji; i++) {
-                Path aktualnyOsobnik = new Path(populacja[i].getPath());
-                int losoweMiasto = random.nextInt(punkty.length-1);
+        while(System.currentTimeMillis()-start< time){
+            for (int i = 0; i < populationSize; i++) {
+                Path actualIndividual = new Path(population[i].getPath());
+                int randomPoint = random.nextInt(points.length-1);
                 while(true){
-                    int miastoPrim;
-                    if(random.nextDouble()<=p){
+                    int pointPrim;
+                    if(random.nextDouble()<= mutationProbability){
                         do{
-                            miastoPrim = random.nextInt(punkty.length-1);
-                        }while (miastoPrim==losoweMiasto);
+                            pointPrim = random.nextInt(points.length-1);
+                        }while (pointPrim==randomPoint);
                     }
                     else{
-                        Path losowyOsobnik;
+                        Path randomIndividual;
                         int index;
                         do{
-                            index=random.nextInt(rozmiarPopulacji-1);
+                            index=random.nextInt(populationSize -1);
                         } while (index==i);
-                        losowyOsobnik=populacja[index];
-                        miastoPrim = znajdzIndex(aktualnyOsobnik.getPath()[losoweMiasto],losowyOsobnik.getPath())+1;
-                        if(miastoPrim==punkty.length){
-                            miastoPrim=0;
+                        randomIndividual= population[index];
+                        pointPrim = findIndex(actualIndividual.getPath()[randomPoint],randomIndividual.getPath())+1;
+                        if(pointPrim== points.length){
+                            pointPrim=0;
                         }
                     }
-                    if (losoweMiasto == miastoPrim + 1 || losoweMiasto == miastoPrim - 1 || (miastoPrim == 0 && losoweMiasto == punkty.length - 1 || (losoweMiasto == 0 && miastoPrim == punkty.length - 1))) {
+                    if (randomPoint == pointPrim + 1 || randomPoint == pointPrim - 1 || (pointPrim == 0 && randomPoint == points.length - 1 || (randomPoint == 0 && pointPrim == points.length - 1))) {
                         break;
                     }
-                    aktualnyOsobnik.odwroc(losoweMiasto,miastoPrim);
-                    losoweMiasto=miastoPrim;
-                    if (obliczFenotyp(aktualnyOsobnik.getPath()) <= obliczFenotyp(najlepszy.getPath())) {
-                        najlepszy = aktualnyOsobnik;
+                    actualIndividual.reverse(randomPoint,pointPrim);
+                    randomPoint=pointPrim;
+                    if (calculateFitness(actualIndividual.getPath()) <= calculateFitness(best.getPath())) {
+                        best = actualIndividual;
                         break;
                     }
                 }
-                if(obliczFenotyp(aktualnyOsobnik.getPath())<=obliczFenotyp(populacja[i].getPath())){
-                    populacja[i]=aktualnyOsobnik;
+                if(calculateFitness(actualIndividual.getPath())<= calculateFitness(population[i].getPath())){
+                    population[i]=actualIndividual;
                 }
             }
         }
 
-        for (int i = 0; i < populacja.length; i++) {
-            if(obliczFenotyp(populacja[i].getPath()) < obliczFenotyp(najlepszy.getPath())){
-                najlepszy=populacja[i];
+        for (int i = 0; i < population.length; i++) {
+            if(calculateFitness(population[i].getPath()) < calculateFitness(best.getPath())){
+                best = population[i];
             }
         }
     }
 
-    private static int znajdzIndex(int value, int[] genotyp){
-        for (int i = 0; i < genotyp.length; i++) {
-            if (genotyp[i]==value){
+    private static int findIndex(int value, int[] genotype){
+        for (int i = 0; i < genotype.length; i++) {
+            if (genotype[i]==value){
                 return i;
             }
         }
         return -1;
     }
 
-    public double obliczFenotyp(int[] genotyp) {
-        double fenotyp = 0;
-        for (int i = 0; i < genotyp.length-1; i++) {
-            fenotyp += Punkt.odlegloscKartezjanska(punkty[genotyp[i]],punkty[genotyp[i+1]]);
+    public double calculateFitness(int[] genotype) {
+        double Phenotype = 0;
+        for (int i = 0; i < genotype.length-1; i++) {
+            Phenotype += calculateDistance(points[genotype[i]], points[genotype[i+1]]);
         }
-        fenotyp += Punkt.odlegloscKartezjanska(punkty[genotyp[punkty.length-1]],punkty[genotyp[0]]);
-        return fenotyp;
+        Phenotype += calculateDistance(points[genotype[points.length-1]], points[genotype[0]]);
+        return Phenotype;
     }
-    public Path[] populacjaZachlanna(int rozmiar) {
-        Path[] populacjaStartowa = new Path[rozmiar];
+    public Path[] greedyPopulation(int size) {
+        Path[] initialPopulation = new Path[size];
 
-        for (int i = 0; i < populacjaStartowa.length; i++) {
-            populacjaStartowa[i]=zachlannyOsobnik();
+        for (int i = 0; i < initialPopulation.length; i++) {
+            initialPopulation[i]= greedyIndividual();
         }
-        return populacjaStartowa;
+        return initialPopulation;
     }
-    public Path zachlannyOsobnik() {
+    public Path greedyIndividual() {
             double minValue = Double.MAX_VALUE;
             int minIndex = -1;
 
-            int[] genotyp = new int[punkty.length];
-            for (int i = 0; i < genotyp.length; i++) {
-                genotyp[i] = -1;
+            int[] genotype = new int[points.length];
+            for (int i = 0; i < genotype.length; i++) {
+                genotype[i] = -1;
             }
 
-            genotyp[0] = random.nextInt(punkty.length);
-            for (int i = 0; i < genotyp.length - 1; i++) {
-                for (int j = 0; j < genotyp.length; j++) {
-                    if (Punkt.odlegloscKartezjanska(punkty[genotyp[i]], punkty[j]) < minValue) {
-                        if (!zawiera(genotyp, j, i + 1)) {
-                            minValue = Punkt.odlegloscKartezjanska(punkty[genotyp[i]], punkty[j]);
+            genotype[0] = random.nextInt(points.length);
+            for (int i = 0; i < genotype.length - 1; i++) {
+                for (int j = 0; j < genotype.length; j++) {
+                    if (calculateDistance(points[genotype[i]], points[j]) < minValue) {
+                        if (!contains(genotype, j, i + 1)) {
+                            minValue = calculateDistance(points[genotype[i]], points[j]);
                             minIndex = j;
                         }
                     }
                 }
-                genotyp[i + 1] = minIndex;
+                genotype[i + 1] = minIndex;
                 minIndex = -1;
                 minValue = Double.MAX_VALUE;
             }
 
-        return new Path(genotyp);
+        return new Path(genotype);
     }
-    private boolean zawiera(int[] genotyp, int value,int length){
+    private boolean contains(int[] genotype, int value, int length){
         for (int i = 0; i < length; i++) {
-            if(genotyp[i] == value) {
+            if(genotype[i] == value) {
                 return true;
             }
         }
         return false;
+    }
+
+    public static double calculateDistance(HeadPosition h1, HeadPosition h2){
+        return Math.sqrt((h2.getX()-h1.getX())*(h2.getX()-h1.getX())+(h2.getY()-h1.getY())*(h2.getY()-h1.getY()));
     }
 }

@@ -19,6 +19,7 @@ public class EquipmentSingleArray {
     private List<HeadPosition> possibleHeadPositions;
     private List<Hole> holes;
 
+    //random
     public EquipmentSingleArray(int width, int height, int numberOfDrills, List<HeadPosition> possibleHeadPositions, List<Hole> holes) {
         this.width = width;
         this.height = height;
@@ -30,6 +31,7 @@ public class EquipmentSingleArray {
         calculateSteps();
     }
 
+    //krzyzowanie
     public EquipmentSingleArray(EquipmentSingleArray equipment1, EquipmentSingleArray equipment2){
         this.width = equipment1.width;
         this.height = equipment1.height;
@@ -39,6 +41,7 @@ public class EquipmentSingleArray {
         headEquipment = newHeadEquipment(equipment1.getPatternsList(),equipment2.getPatternsList());
         calculateSteps();
     }
+
 
     private int[] newHeadEquipment(List<Pattern> patterns1, List<Pattern> patterns2){
         for (int i = 0; i < patterns2.size(); i++) {
@@ -174,6 +177,10 @@ public class EquipmentSingleArray {
 
     public List<HeadPosition> getHeadPositions() {
         return headPositions;
+    }
+
+    public void setHeadPositions(List<HeadPosition> headPositions) {
+        this.headPositions = headPositions;
     }
 
     public List<Pattern> getPatternsList() {

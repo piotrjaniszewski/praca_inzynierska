@@ -1,8 +1,6 @@
 package pl.piotrjaniszewski.inz.Workpiece;
 
 
-import pl.piotrjaniszewski.inz.Head.Equipment;
-import pl.piotrjaniszewski.inz.Head.EquipmentSingleArray;
 import pl.piotrjaniszewski.inz.Head.HeadPosition;
 
 import java.io.File;

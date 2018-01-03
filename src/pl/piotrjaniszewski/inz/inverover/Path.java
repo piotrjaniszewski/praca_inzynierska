@@ -13,30 +13,30 @@ public class Path {
         return path;
     }
 
-    public void odwroc(int miasto1,int miasto2){
-        int[] genotyp = this.getPath().clone();
-        if(miasto1<miasto2){
-            genotyp=odwracaj(genotyp,miasto1+1,miasto2,(miasto2-miasto1)/2);
+    public void reverse(int point1, int point2){
+        int[] genotype = this.getPath().clone();
+        if(point1<point2){
+            genotype= reverse(genotype,point1+1,point2,(point2-point1)/2);
         } else {
-            if(genotyp.length-miasto1 -1 >= miasto2+1){
-                genotyp=odwracaj(genotyp,0,miasto1+miasto2+1,miasto2);
-                genotyp=odwracaj(genotyp, miasto1+miasto2+2,genotyp.length-1,(genotyp.length-miasto1-miasto2-2)/2);
+            if(genotype.length-point1 -1 >= point2+1){
+                genotype= reverse(genotype,0,point1+point2+1,point2);
+                genotype= reverse(genotype, point1+point2+2,genotype.length-1,(genotype.length-point1-point2-2)/2);
             } else {
-                genotyp=odwracaj(genotyp,miasto1+1,miasto2,genotyp.length-miasto1-1);
-                genotyp=odwracaj(genotyp,0,miasto2-(genotyp.length-miasto1-1),(miasto2-(genotyp.length-miasto1-1) + 1)/2);
+                genotype= reverse(genotype,point1+1,point2,genotype.length-point1-1);
+                genotype= reverse(genotype,0,point2-(genotype.length-point1-1),(point2-(genotype.length-point1-1) + 1)/2);
             }
         }
-        this.path = genotyp;
+        this.path = genotype;
     }
 
-    private int[] odwracaj(int[] genotyp, int start, int end, int length){
+    private int[] reverse(int[] genotype, int start, int end, int length){
         int tmp;
         for (int i = 0; i < length; i++) {
-            tmp=genotyp[start+i];
-            genotyp[start+i]=genotyp[end-i];
-            genotyp[end-i]=tmp;
+            tmp=genotype[start+i];
+            genotype[start+i]=genotype[end-i];
+            genotype[end-i]=tmp;
         }
-        return genotyp;
+        return genotype;
     }
 
     @Override
