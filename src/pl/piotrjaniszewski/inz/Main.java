@@ -9,7 +9,7 @@ public class Main {
         Workpiece workpiece = new Workpiece("test1.txt");
         int populationSize = 20;
         double mutationProbability = 0;
-        long duration = 180*1000;
+        long duration = 30*60*1000;
         int headWidth = 8;
         int headHeight = 10;
         int numberOfDrills = 4;
@@ -23,5 +23,9 @@ public class Main {
         System.out.println();
         System.out.println(best);
         System.out.println();
+
+        for (int i = 0; i < best.getHeadPositions().size(); i++) {
+            System.out.println((i+1)+" "+best.getHeadPositions().get(i).getX()+" "+best.getHeadPositions().get(i).getY());
+        }
     }
 }
