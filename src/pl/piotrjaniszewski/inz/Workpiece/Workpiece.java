@@ -1,6 +1,5 @@
 package pl.piotrjaniszewski.inz.Workpiece;
 
-
 import pl.piotrjaniszewski.inz.Head.HeadPosition;
 
 import java.io.File;

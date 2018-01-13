@@ -6,7 +6,6 @@ import pl.piotrjaniszewski.inz.Workpiece.Hole;
 import pl.piotrjaniszewski.inz.Workpiece.Workpiece;
 import pl.piotrjaniszewski.inz.inverover.InverOver;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -53,13 +52,13 @@ public class EquipmentOptimizationAlgorithm {
         }
         best = findBest(population);
         bestList.add(best);
+
         while (System.currentTimeMillis()-startTime< duration){
             List<EquipmentSingleArray> newPopulation = new LinkedList<>();
             for (int i = 0; i < populationSize; i++) {
                 EquipmentSingleArray equipmentSingleArray1= getEquipment();
-                EquipmentSingleArray equipmentSingleArray2 = getEquipment(equipmentSingleArray1);
+                EquipmentSingleArray equipmentSingleArray2 = getEquipment();//getEquipment(equipmentSingleArray1);
                 newPopulation.add(new EquipmentSingleArray( equipmentSingleArray1,equipmentSingleArray2));
-//                newPopulation.add(new EquipmentSingleArray(headWidth,headHeight,numberOfDrills,anyHeadPositions,holes));
             }
 
             EquipmentSingleArray populationBest = findBest(newPopulation);
@@ -68,7 +67,7 @@ public class EquipmentOptimizationAlgorithm {
                 smallestNumberofSteps=best.getNumberOfSteps();
                 bestList=new LinkedList<>();
                 bestList.add(best);
-                System.out.println("Nowy minimalny: "+best.getNumberOfSteps());
+                System.out.println("Nowy minimalny: "+best.getNumberOfSteps()+" Czas: "+(System.currentTimeMillis()-startTime));//todo dodać czas
             } else if(populationBest.getNumberOfSteps()==best.getNumberOfSteps()){
                 if(!bestList.contains(populationBest)){
                     bestList.add(populationBest);
@@ -78,10 +77,13 @@ public class EquipmentOptimizationAlgorithm {
             this.population=newPopulation;
         }
         System.out.println("ilosc najlepszych: "+bestList.size());
-        int shortestPathIndex=-1;
-        double shortestPathLength =Double.MAX_VALUE;
+        int shortestPathIndex = -1;
+        double shortestPathLength = Double.MAX_VALUE;
         int[] bestPath = null;
+
+        //obliczanie najkrótrzej drogi
         for (int i = 0; i < bestList.size(); i++) {
+            bestList.get(i).getHeadPositions().add(0,new HeadPosition(0,0,new LinkedList<>()));
             HeadPosition[] points = new HeadPosition[bestList.get(i).getHeadPositions().size()];
             for (int j = 0; j < points.length; j++) {
                 points[j]=bestList.get(i).getHeadPositions().get(j);
@@ -101,137 +103,30 @@ public class EquipmentOptimizationAlgorithm {
         }
         best = bestList.get(shortestPathIndex);
 
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-
-
-
-
-        InverOver inverOver = new InverOver(10,1000,0.03, best.getHeadPositions().toArray(new HeadPosition[best.getHeadPositions().size()]));
-
-        int[] tmpp = new int[best.getHeadPositions().size()];
-        for (int i = 0; i < best.getHeadPositions().size(); i++) {
-            tmpp[i]=i;
-        }
-
-        inverOver.start();
-        System.out.println(inverOver.calculateFitness(inverOver.getBest().getPath()));
-        System.out.print("Path{path=[");
-        for (int i = 0; i < bestPath.length; i++) {
-            System.out.print(bestPath[i]+", ");
-        }
-        System.out.println();
-        System.out.println(inverOver.getBest().toString());
-
-
-
-
-
-
-
-
         //sortowanie
         List<HeadPosition> bestHeadPositions = best.getHeadPositions();
         HeadPosition[] headPositions = new HeadPosition[bestHeadPositions.size()];
-        for (int i = 0; i < bestPath.length; i++) {
+        for (int i = 0; i < headPositions.length; i++) {
             headPositions[i]=bestHeadPositions.get(bestPath[i]);
         }
-        List<HeadPosition> headPositionList = new LinkedList(Arrays.asList(headPositions));
-        best.setHeadPositions(headPositionList);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-
-        inverOver = new InverOver(10,1000,0.03, best.getHeadPositions().toArray(new HeadPosition[best.getHeadPositions().size()]));
-
-        tmpp = new int[best.getHeadPositions().size()];
-        for (int i = 0; i < best.getHeadPositions().size(); i++) {
-            tmpp[i]=i;
-        }
-
-        inverOver.start();
-        System.out.println(inverOver.calculateFitness(inverOver.getBest().getPath()));
-        System.out.print("Path{path=[");
+        //przesunieci aby punkt 0,0 był pierwszy
+        int firstIndex = -1;
         for (int i = 0; i < bestPath.length; i++) {
-            System.out.print(bestPath[i]+", ");
+            if(bestPath[i]==0){
+                firstIndex=i;
+                break;
+            }
         }
-        System.out.println();
-        System.out.println(inverOver.getBest().toString());
-
-
-
-
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-
-
-
-
-
-
-
+        List<HeadPosition> headPositionList = new LinkedList();
+        for (int i = firstIndex; i < headPositions.length; i++) {
+            headPositionList.add(headPositions[i]);
+        }
+        for (int i = 0; i < firstIndex; i++) {
+            headPositionList.add(headPositions[i]);
+        }
+        best.setHeadPositions(headPositionList);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public EquipmentSingleArray getBest() {
