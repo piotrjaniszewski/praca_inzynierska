@@ -7,9 +7,9 @@ import pl.piotrjaniszewski.inz.Workpiece.Workpiece;
 public class Main {
     public static void main(String[] args) {
         Workpiece workpiece = new Workpiece("test1.txt");
-        int populationSize = 20;
+        int populationSize = 30;
         double mutationProbability = 0;
-        long duration = 30*60*1000;
+        long duration = 60*1000;
         int headWidth = 8;
         int headHeight = 10;
         int numberOfDrills = 4;

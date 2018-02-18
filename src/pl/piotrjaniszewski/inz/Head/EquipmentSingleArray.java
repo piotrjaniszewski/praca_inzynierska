@@ -50,6 +50,8 @@ public class EquipmentSingleArray {
             }
         }
 
+        Collections.sort(patterns1, Comparator.comparingInt(Pattern::getImprovement));
+
         int[] newHeadEquipment = new int[width+height];
         while(!patterns1.isEmpty()){
             //sprawdzam nastepny patern
@@ -304,6 +306,17 @@ public class EquipmentSingleArray {
             }
         }
         return holes;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        EquipmentSingleArray eq2 = (EquipmentSingleArray)obj;
+        for (int i = 0; i < headEquipment.length; i++) {
+            if(this.headEquipment[i]!=eq2.headEquipment[i]){
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

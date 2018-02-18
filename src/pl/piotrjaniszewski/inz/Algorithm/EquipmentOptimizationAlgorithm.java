@@ -6,9 +6,7 @@ import pl.piotrjaniszewski.inz.Workpiece.Hole;
 import pl.piotrjaniszewski.inz.Workpiece.Workpiece;
 import pl.piotrjaniszewski.inz.inverover.InverOver;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class EquipmentOptimizationAlgorithm {
     private Workpiece workpiece;
@@ -27,6 +25,8 @@ public class EquipmentOptimizationAlgorithm {
     private EquipmentSingleArray best;
     private List<EquipmentSingleArray> population;
     private Random rnd = new Random();
+
+    private long populationNumber = 0;
 
     public EquipmentOptimizationAlgorithm(Workpiece workpiece, int populationSize, double mutationProbability, long duration, int headWidth, int headHeight, int numberOfDrills) {
         this.workpiece = workpiece;
@@ -54,21 +54,33 @@ public class EquipmentOptimizationAlgorithm {
         bestList.add(best);
 
         while (System.currentTimeMillis()-startTime< duration){
+            populationNumber++;
             List<EquipmentSingleArray> newPopulation = new LinkedList<>();
-            for (int i = 0; i < populationSize; i++) {
-                EquipmentSingleArray equipmentSingleArray1= getEquipment();
-                EquipmentSingleArray equipmentSingleArray2 = getEquipment();//getEquipment(equipmentSingleArray1);
-                newPopulation.add(new EquipmentSingleArray( equipmentSingleArray1,equipmentSingleArray2));
+            for (int i = 0; i < populationSize-1; i++) {
+                //krzyzowanie
+                for (int j = i+1; j < populationSize-1; j++) {
+                    newPopulation.add(new EquipmentSingleArray(population.get(i),population.get(j)));
+                }
             }
+            
+            //eliminacja
+            Collections.sort(newPopulation, Comparator.comparingInt(EquipmentSingleArray::getNumberOfSteps));
 
+            List<EquipmentSingleArray> selectedPopulation = new LinkedList<>();
+
+            for (int i = 0; i < populationSize; i++) {
+                selectedPopulation.add(newPopulation.get(i));
+            }
+            
             EquipmentSingleArray populationBest = findBest(newPopulation);
             if(populationBest.getNumberOfSteps() < best.getNumberOfSteps()){
                 best=populationBest;
                 smallestNumberofSteps=best.getNumberOfSteps();
                 bestList=new LinkedList<>();
                 bestList.add(best);
-                System.out.println("Nowy minimalny: "+best.getNumberOfSteps()+" Czas: "+(System.currentTimeMillis()-startTime));//todo dodać czas
-            } else if(populationBest.getNumberOfSteps()==best.getNumberOfSteps()){
+                System.out.println("Nowy minimalny: "+best.getNumberOfSteps()+" Czas: "+(System.currentTimeMillis()-startTime));
+            }
+            else if(populationBest.getNumberOfSteps()==best.getNumberOfSteps()){
                 if(!bestList.contains(populationBest)){
                     bestList.add(populationBest);
                 }
@@ -89,7 +101,7 @@ public class EquipmentOptimizationAlgorithm {
                 points[j]=bestList.get(i).getHeadPositions().get(j);
             }
 
-            InverOver inverOver = new InverOver(25,120*1000,0.02,points);
+            InverOver inverOver = new InverOver(25,60*1,0.02,points);
             inverOver.start();
 
             double currentFitnessValue = inverOver.calculateFitness(inverOver.getBest().getPath());
@@ -126,6 +138,7 @@ public class EquipmentOptimizationAlgorithm {
             headPositionList.add(headPositions[i]);
         }
         best.setHeadPositions(headPositionList);
+        System.out.println("populationNumber = " + populationNumber);
     }
 
 
