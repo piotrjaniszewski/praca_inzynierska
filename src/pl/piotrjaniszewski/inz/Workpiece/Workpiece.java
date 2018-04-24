@@ -10,19 +10,32 @@ public class Workpiece {
     private int holes[][];
     private int height;
     private int width;
-    private String path;
+    private String filePath;
+    private double averagePathLength;
+    private int numberOfHoles;
 
-    public Workpiece(String path) {
-        this.path = path;
+    public Workpiece(String filePath) {
+        this.filePath = filePath;
         readFromFile();
+        this.numberOfHoles=calculateNumberOfHoles();
+        this.averagePathLength=calculateAverageDistance();
     }
 
     public Workpiece(int[][] holes) {
         this.holes = holes;
+        this.numberOfHoles=calculateNumberOfHoles();
+        this.averagePathLength=calculateAverageDistance();
+    }
+
+    public double getAveragePathLength() {
+        return averagePathLength;
+    }
+    public int getNumberOfHoles() {
+        return numberOfHoles;
     }
 
     private void readFromFile() {
-        File file = new File(this.path);
+        File file = new File(this.filePath);
         try {
             Scanner scanner = new Scanner(file);
             this.width = Integer.valueOf(scanner.nextLine());
@@ -44,15 +57,15 @@ public class Workpiece {
         return holes;
     }
 
-    public int getHeight() {
+    private int getHeight() {
         return height;
     }
 
-    public int getWidth() {
+    private int getWidth() {
         return width;
     }
 
-    public int getHole(int x, int y) {
+    private int getHole(int x, int y) {
         return holes[x][y];
     }
 
@@ -135,8 +148,7 @@ public class Workpiece {
         return holes.isEmpty();
     }
 
-
-    public List<HeadPosition> getHeadPositionsWithMinimal(int headWidth, int headHeight, int minimalNumberOfHoles){
+    public List<HeadPosition> getHeadPositions(int headWidth, int headHeight, int minimalNumberOfHoles){
         List<HeadPosition> headPositions = new LinkedList<>();
 
         for (int i = -headWidth ; i < width + headWidth + 1; i++) {
@@ -165,5 +177,38 @@ public class Workpiece {
             }
         }
         return headPositions;
+    }
+
+    public double calculateAverageDistance(){
+        List<Hole> holeList = getHolesList();
+        holeList.add(0,new Hole(0,0,0));
+        double averageDistanceBetweenHoles=0;
+        double averageDistanceToStartPoint=0;
+        int tmp=0;
+        for (int i = 0; i < holeList.size()-1; i++) {
+            for (int j = i+1; j < holeList.size(); j++) {
+                averageDistanceBetweenHoles += calculateDistance(holeList.get(i),holeList.get(j));
+                tmp++;
+            }
+            averageDistanceToStartPoint+=calculateDistance(holeList.get(0),holeList.get(i+1));
+        }
+//        double averageDistance=(2*averageDistanceBetweenHoles)/(numberOfHoles*(numberOfHoles-1))+(2*(averageDistanceToStartPoint))/numberOfHoles;
+        return (averageDistanceBetweenHoles/tmp)*numberOfHoles  ;
+    }
+
+    public int calculateNumberOfHoles(){
+        int numberOfHoles=0;
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if(holes[i][j]!=0){
+                    numberOfHoles++;
+                }
+            }
+        }
+        return numberOfHoles;
+    }
+
+    public static double calculateDistance(Hole h1, Hole h2){
+        return Math.sqrt((h2.getX()-h1.getX())*(h2.getX()-h1.getX())+(h2.getY()-h1.getY())*(h2.getY()-h1.getY()));
     }
 }

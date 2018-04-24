@@ -41,13 +41,14 @@ public class Pattern {
                 numberOfDrills++;
             }
         }
-        improvement=(numberOfDrills*usages)-usages;
+        improvement = (numberOfDrills * usages) - usages;
     }
 
     public void use(){
         usages++;
-        improvement=((usages*numberOfDrills)-usages);
+        improvement = ((usages * numberOfDrills) - usages);
     }
+
     public int[] getPattern() {
         return pattern;
     }
@@ -82,23 +83,18 @@ public class Pattern {
     public int getLength(){
         return pattern.length;
     }
-
     public int getUsages() {
         return usages;
     }
-
     public int getPatternType() {
         return patternType;
     }
-
     public int getNumberOfDrills() {
         return numberOfDrills;
     }
-
     public int getImprovement() {
         return improvement;
     }
-
     @Override
     public boolean equals(Object obj) {
         int[] testedPattern = ((Pattern)obj).pattern;
@@ -112,7 +108,6 @@ public class Pattern {
         }
         return  true;
     }
-
     @Override
     public String toString() {
         return "Pattern{" +
