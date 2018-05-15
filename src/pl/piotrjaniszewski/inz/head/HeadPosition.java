@@ -1,6 +1,6 @@
-package pl.piotrjaniszewski.inz.Head;
+package pl.piotrjaniszewski.inz.head;
 
-import pl.piotrjaniszewski.inz.Workpiece.Hole;
+import pl.piotrjaniszewski.inz.workpiece.Hole;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +13,6 @@ public class HeadPosition {
     public int getX() {
         return x;
     }
-
     public int getY() {
         return y;
     }

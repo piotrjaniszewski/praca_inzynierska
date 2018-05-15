@@ -1,10 +1,9 @@
-package pl.piotrjaniszewski.inz.Workpiece;
+package pl.piotrjaniszewski.inz.workpiece;
 
 public class Hole {
     private int x;
     private int y;
     private int type;
-    private boolean drilled = false;
 
     public Hole(int x, int y, int type) {
         this.x = x;
@@ -15,25 +14,11 @@ public class Hole {
     public int getX() {
         return x;
     }
-
     public int getY() {
         return y;
     }
-
     public int getType() {
         return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public boolean isDrilled() {
-        return drilled;
-    }
-
-    public void setDrilled(boolean drilled) {
-        this.drilled = drilled;
     }
 
     @Override

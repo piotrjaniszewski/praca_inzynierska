@@ -1,7 +1,7 @@
-package pl.piotrjaniszewski.inz.Head;
+package pl.piotrjaniszewski.inz.head;
 
-import pl.piotrjaniszewski.inz.Workpiece.Hole;
-import pl.piotrjaniszewski.inz.Workpiece.Workpiece;
+import pl.piotrjaniszewski.inz.workpiece.Hole;
+import pl.piotrjaniszewski.inz.workpiece.Workpiece;
 
 import java.util.*;
 
@@ -23,7 +23,7 @@ public class Equipment {
     private List<Hole> holes;
     private Workpiece workpiece;
 
-    //random
+    //Tworzenie losowego osobnika
     public Equipment(int width, int height, int numberOfDrills, List<HeadPosition> possibleHeadPositions, Workpiece workpiece) {
         this.width = width;
         this.height = height;
@@ -37,7 +37,7 @@ public class Equipment {
         calculatePath();
     }
 
-    //krzyzowanie
+    //Tworzenie osobnika poprzez krzyżowanie
     public Equipment(Equipment equipment1, Equipment equipment2){
         this.width = equipment1.width;
         this.height = equipment1.height;
@@ -50,15 +50,11 @@ public class Equipment {
         calculatePath();
     }
 
-    //getters setters
     public int getNumberOfSteps() {
         return numberOfSteps;
     }
     public List<HeadPosition> getHeadPositions() {
         return headPositions;
-    }
-    public void setHeadPositions(List<HeadPosition> headPositions) {
-        this.headPositions = headPositions;
     }
     public List<Pattern> getPatternsList() {
         return patternsList;
@@ -71,7 +67,7 @@ public class Equipment {
         return improvement;
     }
 
-    //losowy osobnik
+    //Generowanie losowego uzbrojenia
     private void randomGenerate(){
         headEquipment =new int[width+height];
         for (int i = 0; i < numberOfDrills; i++) {
@@ -91,7 +87,7 @@ public class Equipment {
         }
     }
 
-    //krzyzowanie
+    //Generowanie uzbrojenia poprzez krzyżowanie
     private int[] newHeadEquipment(List<Pattern> patterns1, List<Pattern> patterns2){
         for (int i = 0; i < patterns2.size(); i++) {
             if(!patterns1.contains(patterns2.get(i))){
@@ -103,11 +99,9 @@ public class Equipment {
 
         int[] newHeadEquipment = new int[width+height];
         while(!patterns1.isEmpty()){
-            //sprawdzam nastepny patern
             Pattern pattern = patterns1.get(rnd.nextInt(patterns1.size()));
             List<Integer> positionList= new LinkedList<>();
             if(pattern.getPatternType()==1){
-                //sprawdzam pierwsze umiejscowienie
                 for (int i = 0; i <= width-pattern.getLength(); i++) {
                     positionList = new LinkedList<>();
 
@@ -122,7 +116,6 @@ public class Equipment {
                         positionList.add(i);
                     }
                 }
-                //wylosowac punkt
                 if(!positionList.isEmpty()){
                     int index = positionList.get(rnd.nextInt(positionList.size()));
                     for (int i = 0; i < pattern.getLength(); i++) {
@@ -131,7 +124,6 @@ public class Equipment {
                 }
 
             } else if(pattern.getPatternType()==2) {
-                //sprawdzam pierwsze umiejscowienie
                 for (int i = width; i <= newHeadEquipment.length-pattern.getLength(); i++) {
                     positionList = new LinkedList<>();
 
@@ -146,7 +138,6 @@ public class Equipment {
                         positionList.add(i);
                     }
                 }
-                //wylosowac punkt
                 if(!positionList.isEmpty()){
                     int index = positionList.get(rnd.nextInt(positionList.size()));
                     for (int i = 0; i < pattern.getLength(); i++) {
@@ -171,7 +162,6 @@ public class Equipment {
             patterns1.remove(pattern);
         }
 
-        //mamy juz wszystkie patterny i uzupełniamy wiertłami ( i sprawdzenie czego brakuje )
         int[] drills = new int[numberOfDrills+1];
         List<Integer> emptyDrills = new LinkedList<>();
         for (int i = 0; i < newHeadEquipment.length; i++) {
@@ -203,13 +193,12 @@ public class Equipment {
         return newHeadEquipment;
     }
 
+    //Optymalizowanie liczby pozycji głowicy
     private void calculateSteps(){
-        //dla listy possibleHeadPositions tworze nową listę i bangladesz;
         for (int i = 0; i < possibleHeadPositions.size(); i++) {
-            int x = possibleHeadPositions.get(i).getX(); //pozycja głowicy
-            int y = possibleHeadPositions.get(i).getY(); //pozycja głowicy
+            int x = possibleHeadPositions.get(i).getX();
+            int y = possibleHeadPositions.get(i).getY();
 
-            //związki otworów
             int[] pattern = new int[headEquipment.length];
 
             List<Hole> possibleHoles = new LinkedList<>();
@@ -218,18 +207,14 @@ public class Equipment {
                 int testedX = testedHole.getX()-x;
                 int testedY = testedHole.getY()-y;
                 if(testedY==0){
-                    // poziomo
                     if(headEquipment[testedX]==testedHole.getType()){
                         possibleHoles.add(new Hole(testedHole.getX(),testedHole.getY(),testedHole.getType()));
                         pattern[testedX] = headEquipment[testedX];
-                        //uzywany otwor poziomo
                     }
                 } else {
-                    // pionowo
                     if(headEquipment[width+testedY-1]==testedHole.getType()){
                         possibleHoles.add(new Hole(testedHole.getX(),testedHole.getY(),testedHole.getType()));
                         pattern[width+testedY-1]=headEquipment[width+testedY-1];
-                        //uzywany otwor pionowo
                     }
                 }
             }
@@ -255,10 +240,10 @@ public class Equipment {
             patternsList.get(i).minimisePattern();
         }
 
-        minimizeNumberOfSteps(); // ustawenia gdzie jest ponad 2 otwory
+        minimizeNumberOfSteps();
 
-        List<Hole>remainingHoles = getUndrilledHoles(holes,headPositions); // otwory które nie zostały wywiercone
-        for (int i = 0; i < remainingHoles.size(); i++) { //wiercenie niewywierconych otworow
+        List<Hole>remainingHoles = getUndrilledHoles(holes,headPositions);
+        for (int i = 0; i < remainingHoles.size(); i++) {
             for (int j = 0; j < headEquipment.length; j++) {
                 if(remainingHoles.get(i).getType()== headEquipment[j]){
                     List<Hole> holeList = new LinkedList<>();
@@ -279,6 +264,7 @@ public class Equipment {
         numberOfSteps=headPositions.size();
     }
 
+    //Algorytm znajdowania minimalnego pokrycia zbioru
     private void minimizeNumberOfSteps() {
         List<HeadPosition> minimalHeadPositions = new LinkedList<>();
         while(headPositions.size()!=0){
@@ -292,27 +278,28 @@ public class Equipment {
                 for (int j = 0; j < headPositions.size(); j++) {
                     headPositions.get(j).getPossibleHoles().remove(hole);
                 }
-            } //usunięto wszytkie otwory aktualnego ustawienia głowicy
+            }
             for (int i = 0; i < headPositions.size(); i++) {
                 if(headPositions.get(i).getPossibleHoles().size() < 2){
                     headPositions.remove(headPositions.get(i));
                 }
-            } //usuwam puste ustawienia
+            }
         }
         this.headPositions=minimalHeadPositions;
     }
 
-    //najwięcej otworów przy przy pozycji głowicy
+    //Znajdowanie pozycji głowicy z największą liczbą otworów
     private HeadPosition max(){
         HeadPosition max = headPositions.get(0);
         for (int i = 1; i < headPositions.size(); i++) {
-            if(headPositions.get(i).getPossibleHoles().size()>max.getPossibleHoles().size()){
+            if(headPositions.get(i).getPossibleHoles().size() > max.getPossibleHoles().size()){
                 max = headPositions.get(i);
             }
         }
         return max;
     }
 
+    //Generowanie listy otworów pozostałych do wywiercenia
     private List<Hole> getUndrilledHoles(List<Hole> allHoles, List<HeadPosition>headPositions){
         List<Hole> holes = new LinkedList<>(allHoles);
         for (int i = 0; i < headPositions.size(); i++) {
@@ -323,43 +310,41 @@ public class Equipment {
         return holes;
     }
 
-
-    //obliczanie drogi
-
+    //Optymalizacja długości drogi głowicy
     private void calculatePath(){
-        double minValue = Double.MAX_VALUE;
+        double minVal = Double.MAX_VALUE;
         int minIndex = -1;
         headPositions.add(new HeadPosition(0,0,null));
-        List<HeadPosition> newHeadPositions = new LinkedList<>();
-        newHeadPositions.add(this.headPositions.get(rnd.nextInt(this.headPositions.size())));
-        for (int i = 0; i < this.headPositions.size() - 1; i++) {
-            for (int j = 0; j < this.headPositions.size(); j++) {
-                if (calculateDistance(newHeadPositions.get(i), this.headPositions.get(j)) < minValue) {
-                    if (!newHeadPositions.contains(this.headPositions.get(j))) {
-                        minValue = calculateDistance(newHeadPositions.get(i), this.headPositions.get(j));
-                        minIndex = j;
+        List<HeadPosition> newHP = new LinkedList<>();
+        newHP.add(headPositions.get(rnd.nextInt(headPositions.size())));
+        for (int i = 0; i < headPositions.size() - 1; i++) {
+            for (int j = 0; j < headPositions.size(); j++) {
+                if (getDistance(newHP.get(i), headPositions.get(j))<minVal){
+                    if (!newHP.contains(this.headPositions.get(j))){
+                        minVal=getDistance(newHP.get(i),headPositions.get(j));
+                        minIndex=j;
                     }
                 }
             }
-            newHeadPositions.add(this.headPositions.get(minIndex));
+            newHP.add(this.headPositions.get(minIndex));
             minIndex = -1;
-            minValue = Double.MAX_VALUE;
+            minVal = Double.MAX_VALUE;
         }
 
         boolean improvement = false;
         while(improvement){
             improvement=false;
-            double best_distance = calculatePathLength(newHeadPositions);
-            for (int i = 0; i < newHeadPositions.size(); i++) {
-                for (int j = 0; j < newHeadPositions.size(); j++) {
-                    Collections.swap(newHeadPositions,i,j);
-                    if(calculatePathLength(newHeadPositions) < best_distance){
-                        best_distance=calculatePathLength(newHeadPositions);
+            double best_distance = calculatePathLength(newHP);
+            for (int i = 0; i < newHP.size(); i++) {
+                for (int j = 0; j < newHP.size(); j++) {
+                    Collections.swap(newHP,i,j);
+                    if(calculatePathLength(newHP)<best_distance){
+                        best_distance=calculatePathLength(newHP);
                         improvement = true;
                         break;
                     }
                     else{
-                        Collections.swap(newHeadPositions,j,i);
+                        Collections.swap(newHP,j,i);
                     }
                 }
                 if(improvement){
@@ -367,26 +352,25 @@ public class Equipment {
                 }
             }
         }
-
-        this.headPositions = newHeadPositions;
+        this.headPositions = newHP;
         this.pathLength = calculatePathLength(headPositions);
     }
 
+    //Obliczanie długośći drogi
     public double calculatePathLength(List<HeadPosition> headPositions) {
-        double Phenotype = 0;
+        double pathLength = 0;
         for (int i = 0; i < headPositions.size()-1; i++) {
-            Phenotype += calculateDistance(headPositions.get(i),headPositions.get(i+1));
+            pathLength += getDistance(headPositions.get(i),headPositions.get(i+1));
         }
-        Phenotype += calculateDistance(headPositions.get(headPositions.size()-1), headPositions.get(0));
-        return Phenotype;
+        pathLength += getDistance(headPositions.get(headPositions.size()-1), headPositions.get(0));
+        return pathLength;
     }
 
-
-    public static double calculateDistance(HeadPosition h1, HeadPosition h2){
+    //Obliczanie długości drogi między otworami
+    public static double getDistance(HeadPosition h1, HeadPosition h2){
         return Math.sqrt((h2.getX()-h1.getX())*(h2.getX()-h1.getX())+(h2.getY()-h1.getY())*(h2.getY()-h1.getY()));
     }
 
-    //nadpisane metody
     @Override
     public boolean equals(Object obj) {
         Equipment eq2 = (Equipment)obj;

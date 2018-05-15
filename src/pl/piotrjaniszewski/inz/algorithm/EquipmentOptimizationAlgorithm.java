@@ -1,8 +1,8 @@
-package pl.piotrjaniszewski.inz.Algorithm;
+package pl.piotrjaniszewski.inz.algorithm;
 
-import pl.piotrjaniszewski.inz.Head.Equipment;
-import pl.piotrjaniszewski.inz.Head.HeadPosition;
-import pl.piotrjaniszewski.inz.Workpiece.Workpiece;
+import pl.piotrjaniszewski.inz.head.Equipment;
+import pl.piotrjaniszewski.inz.head.HeadPosition;
+import pl.piotrjaniszewski.inz.workpiece.Workpiece;
 
 import java.util.*;
 
@@ -18,7 +18,6 @@ public class EquipmentOptimizationAlgorithm {
 
     private Equipment best;
     private List<Equipment> population;
-    private Random rnd = new Random();
 
     public EquipmentOptimizationAlgorithm(Workpiece workpiece, int populationSize, long duration, int headWidth, int headHeight, int numberOfDrills) {
         this.workpiece = workpiece;
@@ -32,6 +31,7 @@ public class EquipmentOptimizationAlgorithm {
 
     public void start() {
         System.out.println("Rozpoczęcie działania algorytmu.");
+        System.out.println();
         long startTime = System.currentTimeMillis();
         //populacja startowa
         population = new LinkedList<>();
@@ -39,8 +39,6 @@ public class EquipmentOptimizationAlgorithm {
             population.add(new Equipment(headWidth, headHeight, numberOfDrills, anyHeadPositions, workpiece));
         }
         best = population.get(0);
-        bestSteps=best.getNumberOfSteps();
-        bestLength= best.getPathLength();
         while (System.currentTimeMillis() - startTime < duration) {
             List<Equipment> newPopulation = new LinkedList<>();
             //krzyzowanie
@@ -77,50 +75,7 @@ public class EquipmentOptimizationAlgorithm {
             }
         }
     }
-
-    double bestLength;
-    double bestSteps;
-
     public Equipment getBest() {
-        return population.get(0);
-    }
-    private Equipment getEquipment(){
-        Equipment equipment1 = population.get(rnd.nextInt(populationSize-1));
-        Equipment equipment2 = population.get(rnd.nextInt(populationSize-1));
-
-        if(equipment1.getNumberOfSteps()>equipment2.getNumberOfSteps()){
-            return equipment1;
-        } else {
-            return equipment2;
-        }
-    }
-    private Equipment getEquipment(Equipment equipment1){
-
-        Equipment bestEq= equipment1;
-        int bestPatternNumber=0;
-        for (int i = 0; i < populationSize; i++) {
-            Equipment tmp = population.get(i);
-            int patternsNumber = 0;
-            for (int j = 0; j < tmp.getPatternsList().size(); j++) {
-                if(!bestEq.getPatternsList().contains(tmp.getPatternsList().get(j))){
-                    patternsNumber++;
-                }
-            }
-            if( patternsNumber>bestPatternNumber ){
-                bestEq=tmp;
-            }
-        }
-        return bestEq;
-    }
-    private Equipment findBest(List<Equipment> population){
-//        Equipment best = population.get(0);
-//        double min = best.getFitness();
-//        for (int i = 0; i < population.size(); i++) {
-//            if(population.get(i).getFitness() < min){
-//                best=population.get(i);
-//                min = population.get(i).getNumberOfSteps();
-//            }
-//        }
         return population.get(0);
     }
 }

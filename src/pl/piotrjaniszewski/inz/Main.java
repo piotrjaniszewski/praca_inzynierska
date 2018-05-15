@@ -1,14 +1,14 @@
 package pl.piotrjaniszewski.inz;
 
-import pl.piotrjaniszewski.inz.Algorithm.EquipmentOptimizationAlgorithm;
-import pl.piotrjaniszewski.inz.Head.Equipment;
-import pl.piotrjaniszewski.inz.Workpiece.Workpiece;
+import pl.piotrjaniszewski.inz.algorithm.EquipmentOptimizationAlgorithm;
+import pl.piotrjaniszewski.inz.head.Equipment;
+import pl.piotrjaniszewski.inz.workpiece.Workpiece;
 
 public class Main {
     public static void main(String[] args) {
-        Workpiece workpiece = new Workpiece("p9.txt");
+        Workpiece workpiece = new Workpiece("examples/p9.txt");
         int populationSize = 30;
-        long duration = 5*60*60*1000;
+        long duration = 2*60*1000;
         int headWidth = 8;
         int headHeight = 7;
         int numberOfDrills = 5;
